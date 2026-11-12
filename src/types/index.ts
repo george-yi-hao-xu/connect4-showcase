@@ -30,3 +30,8 @@ export type GameState = {
     matrix: GamePlace[][],
     current_player: WhichPlayer
 }
+
+export type CellPos = {
+    col: number,
+    row: number
+}

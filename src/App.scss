@@ -10,3 +10,56 @@ body {
     padding: 0;
     font-size: 14px;
 }
+
+.app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    .app-main {
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+
+
+
+        .game-board{
+            display: flex;
+            flex-direction: row;
+            
+            .cell-col {
+                display: flex;
+                flex-direction: column;
+
+                .cell{
+                    width: 36px;
+                    height: 36px;
+                    border: 1px solid black;
+
+                    &.RED {
+                        background: radial-gradient(
+                            circle at 30% 30%,
+                            var(--color-red-start),
+                            var(--color-red-end)
+                        );
+                    }
+
+                    &.YELLOW {
+                        background: radial-gradient(
+                            circle at 30% 30%,
+                            var(--color-yellow-start),
+                            var(--color-yellow-end)
+                        );
+                    }
+
+                    &.NONE {
+                        background: var(--color-bg-cell-empty);
+                    }
+                }
+            }
+        }
+    }
+}
