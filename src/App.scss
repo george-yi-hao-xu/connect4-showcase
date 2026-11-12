@@ -9,6 +9,26 @@ body {
     margin: 0;
     padding: 0;
     font-size: 14px;
+    background: var(--color-bg-body);
+    color: var(--color-text-body);
+}
+
+select {
+    background: var(--color-bg-body);
+    color: var(--color-text-body);
+    border: none;
+    cursor: pointer;
+}
+
+button {
+    background: var(--color-bg-body);
+    color: var(--color-text-body);
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        border-bottom: 1px solid var(--color-text-body);
+    }
 }
 
 .app {
@@ -25,7 +45,6 @@ body {
         justify-items: center;
 
 
-
         .game-board{
             display: flex;
             flex-direction: row;
@@ -33,11 +52,14 @@ body {
             .cell-col {
                 display: flex;
                 flex-direction: column;
+                gap: var(--gap);
 
                 .cell{
                     width: 36px;
                     height: 36px;
-                    border: 1px solid black;
+                    border-radius: 50%;
+                    margin: 0 var(--gap);
+                    cursor: pointer;
 
                     &.RED {
                         background: radial-gradient(
@@ -57,6 +79,41 @@ body {
 
                     &.NONE {
                         background: var(--color-bg-cell-empty);
+                    }
+
+                    &.finished {
+                        cursor: default;
+                    }
+
+                    &.finished:not(.winning){
+                        opacity: 0.5;
+                    }
+                }
+            }
+        }
+
+        .control {
+            display: flex;
+            flex-direction: row;
+            margin: var(--gap-l) 0;
+
+            .turn-status{
+                display: flex;
+                flex-direction: row;
+                gap: var(--gap);
+
+                .turn-indicator{
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+
+                    &.P1{
+                        background: var(--color-red-end);
+                    }
+
+                    &.P2{
+                        background: var(--color-yellow-end);
                     }
                 }
             }

@@ -14,7 +14,8 @@ export enum Mode {
 // status
 export type Status = {
     tag: 'Win' | 'Draw' | 'OnGoing';
-    player?: WhichPlayer
+    player?: WhichPlayer;
+    winning_cells?: CellPos[]
 }
 
 export enum GamePlace {

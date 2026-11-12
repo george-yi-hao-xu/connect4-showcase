@@ -7,7 +7,7 @@ import { GameMove, Mode, WhichPlayer, type Status } from './types'
 function App(){
     const [gameState, setGameState] = useState(create_an_empty_connect4_game_state(ROW, COL));
     const [gameStatus, setGameStatus] = useState<Status>({tag: 'OnGoing', player: WhichPlayer.P1});
-    const [mode, setMode] = useState<Mode>(Mode.HumanAi);
+    const [mode, setMode] = useState<Mode>(Mode.HumanHuman);
 
     function handleCellClick(col: GameMove) {
         // check if it's a legal move; some cols are full
@@ -35,6 +35,28 @@ function App(){
         setGameStatus(new_status)
     }
 
+
+    function handleModeChange(newMode: Mode){
+        const new_empty_state = create_an_empty_connect4_game_state(ROW, COL);
+        setMode(newMode)
+        setGameState(new_empty_state)
+        setGameStatus(check_status(new_empty_state))
+    }
+
+    const _isFinished = gameStatus.tag !== 'OnGoing'
+
+    const _displayedPlayer = gameStatus.tag === 'OnGoing'
+        ? gameState.current_player
+        : gameStatus.tag === 'Win'
+            ? gameStatus.player
+            : '';
+    
+    const _statusText = gameStatus.tag === 'Draw'
+        ? 'Draw'
+        : gameStatus.tag === 'Win'
+            ? `${gameStatus.player} wins`
+            : `${gameState.current_player}'s turn`
+
     return (
         <div className="app">
             <main className="app-main">
@@ -45,16 +67,32 @@ function App(){
                         return <div className={`cell-col`} key={col}>
                             {Array.from({ length: ROW}, (_, row) => {
                                 const place = gameState.matrix[col][row]
+                                const isWinning = gameStatus.winning_cells?.some(cell => cell.col === col && cell.row === row)
 
-                                return <div className={`cell ${place}`} key={row} onClick={() => handleCellClick(col)}></div>
+                                return <div className={`cell ${place} ${isWinning ? "winning" : ""} ${_isFinished ? 'finished' : ''}`} key={row} onClick={() => handleCellClick(col)}></div>
                             })}
                             </div>
                     })}
                 </div>
 
                 {/* Status & Controls */}
-                <div>
-                    {JSON.stringify(gameStatus)}
+                <div className="control">
+                    {/* status */}
+                    <div className="turn-status" role="status">
+                        {/* small circle */}
+                        {_displayedPlayer && <span className={`turn-indicator ${_displayedPlayer}`}></span>}
+                        <span>{_statusText}</span>
+                    </div>
+
+                    <div className="control-actions">
+                        <select value={mode} onChange={e => handleModeChange(e.target.value)}>
+                            {Object.values(Mode).map(m => {
+                                return <option value={m} id={m} key={m}>{m}</option>
+                            })}
+                        </select>
+
+                        <button onClick={() => handleModeChange(mode)}>Refresh</button>
+                    </div>
                 </div>
             </main>
         </div>

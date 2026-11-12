@@ -51,14 +51,16 @@ export function check_status(s: GameState, chain = 4): Status {
     if (P1_winning_cells) {
         return {
             tag: 'Win',
-            player: WhichPlayer.P1
+            player: WhichPlayer.P1,
+            winning_cells: P1_winning_cells
         }
     }
 
     if (P2_winning_cells) {
         return {
             tag: 'Win',
-            player: WhichPlayer.P2
+            player: WhichPlayer.P2,
+            winning_cells: P2_winning_cells
         }
     }
 
