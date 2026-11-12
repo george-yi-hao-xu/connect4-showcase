@@ -68,8 +68,11 @@ function App(){
                             {Array.from({ length: ROW}, (_, row) => {
                                 const place = gameState.matrix[col][row]
                                 const isWinning = gameStatus.winning_cells?.some(cell => cell.col === col && cell.row === row)
+                                const isLast = gameState.last_drop?.col === col && gameState.last_drop?.row === row
 
-                                return <div className={`cell ${place} ${isWinning ? "winning" : ""} ${_isFinished ? 'finished' : ''}`} key={row} onClick={() => handleCellClick(col)}></div>
+                                return <div 
+                                    className={`cell ${place} ${isWinning ? "winning" : ""} ${_isFinished ? 'finished' : ''} ${isLast ? 'last' : ''}`} 
+                                    key={row} onClick={() => handleCellClick(col)}></div>
                             })}
                             </div>
                     })}

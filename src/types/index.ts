@@ -29,7 +29,8 @@ export type GameMove = number;
 // state
 export type GameState = {
     matrix: GamePlace[][],
-    current_player: WhichPlayer
+    current_player: WhichPlayer,
+    last_drop?: CellPos
 }
 
 export type CellPos = {

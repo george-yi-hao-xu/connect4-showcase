@@ -104,6 +104,7 @@ export function find_winning_cells(m:GamePlace[][], target:GamePlace, chain =4 )
 export function apply_move(s: GameState, m: GameMove): GameState{
     const new_matrix: GamePlace[][] = []
     const place = s.current_player === WhichPlayer.P1 ? GamePlace.RED : GamePlace.YELLOW;
+    let row = 0;
 
     for (let i = 0; i < s.matrix.length; i++){
         if (i != m) {
@@ -112,6 +113,7 @@ export function apply_move(s: GameState, m: GameMove): GameState{
             const target_col = [...s.matrix[i]]
             target_col.reverse();
             const target_index = target_col.indexOf(GamePlace.NONE);
+            row = target_col.length - target_index - 1;
             target_col[target_index] = place;
             target_col.reverse();
 
@@ -121,6 +123,10 @@ export function apply_move(s: GameState, m: GameMove): GameState{
 
     return {
         matrix: new_matrix,
-        current_player: s.current_player === WhichPlayer.P1 ? WhichPlayer.P2 : WhichPlayer.P1
+        current_player: s.current_player === WhichPlayer.P1 ? WhichPlayer.P2 : WhichPlayer.P1,
+        last_drop: {
+            row: row,
+            col: m
+        }
     }
 }

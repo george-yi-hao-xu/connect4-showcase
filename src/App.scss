@@ -61,6 +61,14 @@ button {
                     margin: 0 var(--gap);
                     cursor: pointer;
 
+                    &.last {
+                        animation: dropIn 0.25s ease-in-out;
+                    }
+
+                    &.last:not(.winning){
+                        filter: brightness(1.25);
+                    }
+
                     &.RED {
                         background: radial-gradient(
                             circle at 30% 30%,
@@ -118,5 +126,22 @@ button {
                 }
             }
         }
+    }
+}
+
+@keyframes dropIn{
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0.6;
+    }
+    70% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    85% {
+        transform: translateY(-0.35rem);
+    }
+    100%{
+        transform: translateY(0);
     }
 }
