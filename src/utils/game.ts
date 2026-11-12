@@ -85,7 +85,7 @@ export function find_winning_cells(m:GamePlace[][], target:GamePlace, chain =4 )
                 for (let step = 0; step < chain; step++){
                     const next_col_i = col_i + step * dc
                     const next_row_i = row_i + step * dr
-                    const next_cell = m[next_col_i][next_row_i]
+                    const next_cell = m[next_col_i]?.[next_row_i]
 
                     if (next_cell != target) break
                     collection_cells.push({col: next_col_i, row: next_row_i})
@@ -97,4 +97,28 @@ export function find_winning_cells(m:GamePlace[][], target:GamePlace, chain =4 )
     }
 
     return null
+}
+
+export function apply_move(s: GameState, m: GameMove): GameState{
+    const new_matrix: GamePlace[][] = []
+    const place = s.current_player === WhichPlayer.P1 ? GamePlace.RED : GamePlace.YELLOW;
+
+    for (let i = 0; i < s.matrix.length; i++){
+        if (i != m) {
+            new_matrix.push([...s.matrix[i]])
+        } else {
+            const target_col = [...s.matrix[i]]
+            target_col.reverse();
+            const target_index = target_col.indexOf(GamePlace.NONE);
+            target_col[target_index] = place;
+            target_col.reverse();
+
+            new_matrix.push(target_col)
+        }
+    }
+
+    return {
+        matrix: new_matrix,
+        current_player: s.current_player === WhichPlayer.P1 ? WhichPlayer.P2 : WhichPlayer.P1
+    }
 }

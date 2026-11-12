@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import "./App.scss";
-import { create_an_empty_connect4_game_state, get_legal_moves, check_status } from './utils/game';
+import { create_an_empty_connect4_game_state, get_legal_moves, check_status, apply_move } from './utils/game';
 import { COL, ROW } from './constants'
 import { GameMove, Mode, WhichPlayer, type Status } from './types'
 
@@ -26,7 +26,13 @@ function App(){
         }
 
         // update state and status
-        
+        const new_state = apply_move(gameState, col);
+        const new_status = check_status(new_state)
+
+
+        // update
+        setGameState(new_state)
+        setGameStatus(new_status)
     }
 
     return (
@@ -44,6 +50,11 @@ function App(){
                             })}
                             </div>
                     })}
+                </div>
+
+                {/* Status & Controls */}
+                <div>
+                    {JSON.stringify(gameStatus)}
                 </div>
             </main>
         </div>
