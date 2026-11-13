@@ -24,6 +24,7 @@ button {
     background: var(--color-bg-body);
     color: var(--color-text-body);
     border: none;
+    border-bottom: 1px solid transparent;
     cursor: pointer;
 
     &:hover {
@@ -44,6 +45,21 @@ button {
         flex-direction: column;
         justify-items: center;
 
+        .hint-btn-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            padding-right: var(--gap-l);
+            margin-bottom: var(--gap-l);
+
+            .hint-button{
+                &:disabled{
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+            }
+        }
+
 
         .game-board{
             display: flex;
@@ -53,6 +69,15 @@ button {
                 display: flex;
                 flex-direction: column;
                 gap: var(--gap);
+                border-radius: 18px;
+                padding: var(--gap) 0;
+                transition: outline ease-in-out 200ms;
+                outline: 1px solid transparent;
+
+                &.hint {
+                    outline: 1px solid var(--color-text-body);
+                    outline-offset: 1px;
+                }
 
                 .cell{
                     width: 36px;

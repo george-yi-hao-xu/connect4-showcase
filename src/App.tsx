@@ -10,6 +10,7 @@ function App(){
     const [mode, setMode] = useState<Mode>(Mode.HumanAi);
 
     const [lock, setLock] = useState(false)
+    const [hintMove, setHintMove] = useState<GameMove | null>(null)
 
     function handleCellClick(col: GameMove) {
         if(lock) {
@@ -81,23 +82,37 @@ function App(){
         : gameStatus.tag === 'Win'
             ? `${gameStatus.player} wins`
             : `${gameState.current_player}'s turn`
+                        
+    const is_human_s_turn = mode === Mode.HumanHuman || (mode === Mode.HumanAi && gameState.current_player === WhichPlayer.P1);
 
     return (
         <div className="app">
             <main className="app-main">
+                {/* hint button */}
+                <div className="hint-btn-container">
+                    <button onClick={() => {
+                        if (lock || !is_human_s_turn || gameStatus.tag!== 'OnGoing') return
+
+                        const best_move = minimax(gameState, 5)
+                        setHintMove(best_move);
+                        setTimeout(() => {
+                            setHintMove(null)
+                        }, 500)
+                    }} className="hint-button" disabled={!is_human_s_turn}>Show Hint</button>
+                </div>
 
                 {/* Game Board */}
                 <div className="game-board">
-                    {Array.from({ length: COL}, (_, col) => {
-                        return <div className={`cell-col`} key={col}>
-                            {Array.from({ length: ROW}, (_, row) => {
-                                const place = gameState.matrix[col][row]
-                                const isWinning = gameStatus.winning_cells?.some(cell => cell.col === col && cell.row === row)
-                                const isLast = gameState.last_drop?.col === col && gameState.last_drop?.row === row
+                    {Array.from({ length: COL}, (_, col_i) => {
+                        return <div className={`cell-col ${hintMove === col_i ? 'hint' : ''}`} key={col_i}>
+                            {Array.from({ length: ROW}, (_, row_i) => {
+                                const place = gameState.matrix[col_i][row_i]
+                                const isWinning = gameStatus.winning_cells?.some(cell => cell.col === col_i && cell.row === row_i)
+                                const isLast = gameState.last_drop?.col === col_i && gameState.last_drop?.row === row_i
 
                                 return <div 
                                     className={`cell ${place} ${isWinning ? "winning" : ""} ${_isFinished ? 'finished' : ''} ${isLast ? 'last' : ''}`} 
-                                    key={row} onClick={() => handleCellClick(col)}></div>
+                                    key={row_i} onClick={() => handleCellClick(col_i)}></div>
                             })}
                             </div>
                     })}
