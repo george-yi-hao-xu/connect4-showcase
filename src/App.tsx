@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import "./App.scss";
-import { create_an_empty_connect4_game_state, get_legal_moves, check_status, apply_move } from './utils/game';
-import { COL, ROW } from './constants'
+import { create_an_empty_connect4_game_state, get_legal_moves, check_status, apply_move, minimax } from './utils/game';
+import { COL, ROW, AI_DEPTH } from './constants'
 import { GameMove, Mode, WhichPlayer, type Status } from './types'
 
 function App(){
@@ -26,13 +26,24 @@ function App(){
         }
 
         // update state and status
-        const new_state = apply_move(gameState, col);
-        const new_status = check_status(new_state)
+        const human_new_state = apply_move(gameState, col);
+        const human_new_status = check_status(human_new_state)
 
 
         // update
-        setGameState(new_state)
-        setGameStatus(new_status)
+        setGameState(human_new_state)
+        setGameStatus(human_new_status)
+
+        // call ai if ai mode
+        if(mode === Mode.HumanAi && human_new_status.tag === 'OnGoing') {
+            // call ai
+            const best_move_for_ai = minimax(human_new_state, AI_DEPTH);
+            
+            const ai_new_state = apply_move(human_new_state, best_move_for_ai)
+            const ai_new_status = check_status(ai_new_state)
+            setGameState(ai_new_state)
+            setGameStatus(ai_new_status)
+        }
     }
 
 

@@ -130,3 +130,107 @@ export function apply_move(s: GameState, m: GameMove): GameState{
         }
     }
 }
+
+function score_game_state(s: GameState, chain = 4): number {
+    const status = check_status(s, chain)
+
+    // win case
+    if (status.tag === 'Win') {
+        return status.player === WhichPlayer.P1 ? +Infinity : -Infinity
+    }
+
+    // draw
+    if (status.tag === 'Draw') {
+        return 0
+    }
+
+    const DIRECTIONS = [
+        { dc: 1, dr: 0},
+        { dc: 0, dr: 1},
+        { dc: 1, dr: 1},
+        { dc: 1, dr: -1}
+    ]
+
+    let state_score = 0;
+
+    for (const [col_i, column] of s.matrix.entries()){
+        for (const [row_i, cell] of column.entries()){
+            for (const direction of DIRECTIONS){
+                const { dc, dr } = direction;
+                let red_count = 0;
+                let yellow_count = 0;
+                let is_complete_window = true
+
+                // one direction, how many red/yellow
+                for (let step = 0; step < chain; step++){
+                    const step_place = s.matrix[col_i + step * dc]?.[row_i + step * dr]
+
+                    // go outside
+                    if (step_place === undefined) {
+                        is_complete_window = false
+                        break
+                    }
+
+                    if (step_place === GamePlace.RED) red_count++;
+                    if (step_place === GamePlace.YELLOW) yellow_count++;
+                }
+
+                // impossible to achieve a chain
+                if (!is_complete_window || (red_count > 0 && yellow_count > 0)) continue
+
+                if (red_count > 0) state_score += 10 ** (red_count - 1);
+                if (yellow_count > 0) state_score -= 10 ** (yellow_count - 1);
+            }
+        }
+    }
+
+    return state_score
+}
+
+export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
+    if (check_status(s, chain).tag !== 'OnGoing') throw new Error("Bug: call ai when game is over!")
+
+    // tree search
+    function search_r(s: GameState, current_depth: number) {
+        // end case
+        if (check_status(s).tag !== 'OnGoing' || current_depth === max_depth) {
+            // get score and return
+            return score_game_state(s, chain)
+        }
+
+        // P1-MAX
+        if (s.current_player === WhichPlayer.P1) {
+            let bestScore = -Infinity
+            for (const possible_move of get_legal_moves(s)){
+                bestScore = Math.max(bestScore, search_r(apply_move(s, possible_move), current_depth + 1))
+            }
+
+            return bestScore
+        }
+
+        // P2-MIN
+        let bestScore = +Infinity
+        for (const possible_move of get_legal_moves(s)){
+            bestScore = Math.min(bestScore, search_r(apply_move(s, possible_move), current_depth + 1))
+        }
+        return bestScore
+    }
+
+    // starts here
+    let best_move: GameMove = get_legal_moves(s)[0] 
+    let best_score = s.current_player === WhichPlayer.P1 ? -Infinity : Infinity
+
+    for (const possible_move of get_legal_moves(s)) {
+        const current_score = search_r(apply_move(s, possible_move), 1)
+        const is_better = s.current_player === WhichPlayer.P1
+            ? current_score > best_score
+            : current_score < best_score
+        
+            if (is_better) {
+                best_move = possible_move
+                best_score = current_score
+            }
+    }
+
+    return best_move
+}
