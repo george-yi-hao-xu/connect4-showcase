@@ -13,7 +13,7 @@ function App(){
     const [hintMove, setHintMove] = useState<GameMove | null>(null)
 
     function handleCellClick(col: GameMove) {
-        if(lock) {
+        if(lock || mode === Mode.AiAi) {
             console.warn("Board lock")
             return
         }
@@ -67,6 +67,31 @@ function App(){
         setMode(newMode)
         setGameState(new_empty_state)
         setGameStatus(check_status(new_empty_state))
+
+        // ai vs ai
+        if (newMode === Mode.AiAi) {
+            let ai_game_state = new_empty_state
+            let ai_game_status = check_status(ai_game_state)
+            let i = 0
+
+            // til game over
+            while (ai_game_status.tag === 'OnGoing') {
+                i ++;
+                const ai_move = minimax(ai_game_state, 3)
+
+                ai_game_state = apply_move(ai_game_state, ai_move)
+                ai_game_status = check_status(ai_game_state)
+
+                const state_snap = ai_game_state
+                const status_snap = ai_game_status
+
+                // update
+                setTimeout(() => {
+                    setGameState(state_snap)
+                    setGameStatus(status_snap)
+                }, i * 200)
+            }
+        }
     }
 
     const _isFinished = gameStatus.tag !== 'OnGoing'

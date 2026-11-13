@@ -18,6 +18,7 @@ select {
     color: var(--color-text-body);
     border: none;
     cursor: pointer;
+    text-align: right;
 }
 
 button {
@@ -134,6 +135,7 @@ button {
                 display: flex;
                 flex-direction: row;
                 gap: var(--gap);
+                flex-grow: 1;
 
                 .turn-indicator{
                     width: 18px;
@@ -149,6 +151,12 @@ button {
                         background: var(--color-yellow-end);
                     }
                 }
+            }
+
+            .control-actions{
+                display: flex;
+                flex-direction: row;
+                gap: var(--gap);
             }
         }
     }
