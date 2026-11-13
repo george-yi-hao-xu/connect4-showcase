@@ -7,9 +7,16 @@ import { GameMove, Mode, WhichPlayer, type Status } from './types'
 function App(){
     const [gameState, setGameState] = useState(create_an_empty_connect4_game_state(ROW, COL));
     const [gameStatus, setGameStatus] = useState<Status>({tag: 'OnGoing', player: WhichPlayer.P1});
-    const [mode, setMode] = useState<Mode>(Mode.HumanHuman);
+    const [mode, setMode] = useState<Mode>(Mode.HumanAi);
+
+    const [lock, setLock] = useState(false)
 
     function handleCellClick(col: GameMove) {
+        if(lock) {
+            console.warn("Board lock")
+            return
+        }
+
         // check if it's a legal move; some cols are full
         const all_legal_moves = get_legal_moves(gameState)
         if (!all_legal_moves.includes(col)) {
@@ -34,15 +41,22 @@ function App(){
         setGameState(human_new_state)
         setGameStatus(human_new_status)
 
+
         // call ai if ai mode
         if(mode === Mode.HumanAi && human_new_status.tag === 'OnGoing') {
+            setLock(true);
             // call ai
             const best_move_for_ai = minimax(human_new_state, AI_DEPTH);
             
             const ai_new_state = apply_move(human_new_state, best_move_for_ai)
             const ai_new_status = check_status(ai_new_state)
-            setGameState(ai_new_state)
-            setGameStatus(ai_new_status)
+
+            // render delay
+            setTimeout(() => {
+                setGameState(ai_new_state)
+                setGameStatus(ai_new_status)
+                setLock(false);
+            }, 500)
         }
     }
 
