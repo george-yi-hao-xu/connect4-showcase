@@ -47,13 +47,16 @@ function App(){
         if(mode === Mode.HumanAi && human_new_status.tag === 'OnGoing') {
             setLock(true);
             // call ai
-            const best_move_for_ai = minimax(human_new_state, AI_DEPTH);
-            
-            const ai_new_state = apply_move(human_new_state, best_move_for_ai)
-            const ai_new_status = check_status(ai_new_state)
-
-            // render delay
             setTimeout(() => {
+                console.time('minimax calc')
+                // 5000ms
+                const best_move_for_ai = minimax(human_new_state, AI_DEPTH);
+                console.timeEnd('minimax calc')
+                
+                const ai_new_state = apply_move(human_new_state, best_move_for_ai)
+                const ai_new_status = check_status(ai_new_state)
+
+                // render delay
                 setGameState(ai_new_state)
                 setGameStatus(ai_new_status)
                 setLock(false);
