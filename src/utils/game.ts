@@ -191,7 +191,7 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
     if (check_status(s, chain).tag !== 'OnGoing') throw new Error("Bug: call ai when game is over!")
 
     // tree search
-    function search_r(s: GameState, current_depth: number) {
+    function search_r(s: GameState, current_depth: number, a: number, b: number) {
         // end case
         if (check_status(s).tag !== 'OnGoing' || current_depth === max_depth) {
             // get score and return
@@ -202,7 +202,10 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
         if (s.current_player === WhichPlayer.P1) {
             let bestScore = -Infinity
             for (const possible_move of get_legal_moves(s)){
-                bestScore = Math.max(bestScore, search_r(apply_move(s, possible_move), current_depth + 1))
+                bestScore = Math.max(bestScore, search_r(apply_move(s, possible_move), current_depth + 1, a, b))
+
+                if (bestScore >= b) break;
+                a = Math.max(a, bestScore)
             }
 
             return bestScore
@@ -211,7 +214,10 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
         // P2-MIN
         let bestScore = +Infinity
         for (const possible_move of get_legal_moves(s)){
-            bestScore = Math.min(bestScore, search_r(apply_move(s, possible_move), current_depth + 1))
+            bestScore = Math.min(bestScore, search_r(apply_move(s, possible_move), current_depth + 1, a, b))
+
+            if (bestScore <= a) break;
+            b = Math.min(b, bestScore)
         }
         return bestScore
     }
@@ -219,9 +225,11 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
     // starts here
     let best_move: GameMove = get_legal_moves(s)[0] 
     let best_score = s.current_player === WhichPlayer.P1 ? -Infinity : Infinity
+    let a = -Infinity
+    let b = Infinity
 
     for (const possible_move of get_legal_moves(s)) {
-        const current_score = search_r(apply_move(s, possible_move), 1)
+        const current_score = search_r(apply_move(s, possible_move), 1, a, b)
         const is_better = s.current_player === WhichPlayer.P1
             ? current_score > best_score
             : current_score < best_score
