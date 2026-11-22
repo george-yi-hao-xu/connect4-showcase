@@ -156,7 +156,7 @@ function App(){
                     </div>
 
                     <div className="control-actions">
-                        <select value={mode} onChange={e => handleModeChange(e.target.value)}>
+                        <select value={mode} onChange={e => handleModeChange(e.target.value as Mode)}>
                             {Object.values(Mode).map(m => {
                                 return <option value={m} id={m} key={m}>{m}</option>
                             })}
