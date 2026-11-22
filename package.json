@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build --base=./",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bench:build": "vite build --config vite.bench.config.ts",
+    "bench": "pnpm run bench:build && vitest bench --run"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +25,7 @@
     "@vitejs/plugin-react": "^6.3.0",
     "sass": "^1.108.2",
     "typescript": "^6.0.3",
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }

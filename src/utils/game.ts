@@ -1,3 +1,4 @@
+import { COL } from '../constants';
 import { CellPos, GameMove, GamePlace, GameState, Status, WhichPlayer } from '../types'
 
 export function create_an_empty_connect4_game_state(row: number, col: number): GameState {
@@ -187,21 +188,35 @@ function score_game_state(s: GameState, chain = 4): number {
     return state_score
 }
 
-export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
+function get_legal_moves_o(s: GameState): GameMove[] {
+    const moves = get_legal_moves(s)
+    const center = (COL - 1) / 2
+
+    return moves.sort(
+        (a, b) => Math.abs(a - center) - Math.abs(b - center),
+    )
+}
+
+export function minimax(s: GameState, max_depth = 3, chain = 4, use_ordered_moves = true): GameMove{
     if (check_status(s, chain).tag !== 'OnGoing') throw new Error("Bug: call ai when game is over!")
 
+    // let nodes = 0
     // tree search
     function search_r(s: GameState, current_depth: number, a: number, b: number) {
+        // nodes ++;
         // end case
-        if (check_status(s).tag !== 'OnGoing' || current_depth === max_depth) {
+        if (current_depth >= max_depth || check_status(s).tag !== 'OnGoing') {
             // get score and return
-            return score_game_state(s, chain)
+            const score =  score_game_state(s, chain)
+
+            return score
         }
 
         // P1-MAX
         if (s.current_player === WhichPlayer.P1) {
             let bestScore = -Infinity
-            for (const possible_move of get_legal_moves(s)){
+            const moves = use_ordered_moves ? get_legal_moves_o(s) : get_legal_moves(s)
+            for (const possible_move of moves){
                 bestScore = Math.max(bestScore, search_r(apply_move(s, possible_move), current_depth + 1, a, b))
 
                 if (bestScore >= b) break;
@@ -213,7 +228,8 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
 
         // P2-MIN
         let bestScore = +Infinity
-        for (const possible_move of get_legal_moves(s)){
+        const moves = use_ordered_moves ? get_legal_moves_o(s) : get_legal_moves(s)
+        for (const possible_move of moves){
             bestScore = Math.min(bestScore, search_r(apply_move(s, possible_move), current_depth + 1, a, b))
 
             if (bestScore <= a) break;
@@ -223,12 +239,13 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
     }
 
     // starts here
-    let best_move: GameMove = get_legal_moves(s)[0] 
+    let best_move: GameMove = use_ordered_moves ? get_legal_moves_o(s)[0] : get_legal_moves(s)[0] 
     let best_score = s.current_player === WhichPlayer.P1 ? -Infinity : Infinity
     let a = -Infinity
     let b = Infinity
 
-    for (const possible_move of get_legal_moves(s)) {
+    const moves = use_ordered_moves ? get_legal_moves_o(s) : get_legal_moves(s)
+    for (const possible_move of moves) {
         const current_score = search_r(apply_move(s, possible_move), 1, a, b)
         const is_better = s.current_player === WhichPlayer.P1
             ? current_score > best_score
@@ -238,7 +255,14 @@ export function minimax(s: GameState, max_depth = 3, chain = 4): GameMove{
                 best_move = possible_move
                 best_score = current_score
             }
+        
+            if (s.current_player === WhichPlayer.P1) {
+                a = Math.max(a, best_score)
+            } else {
+                b = Math.min(b, best_score)
+            }
     }
 
+    // console.log("search_r called: ", nodes)
     return best_move
 }
